@@ -172,15 +172,25 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
-    #initialize Queue and visited list, and add initial state to it
+    #initialize Queue and visited list, and add initial state to it, currently adding duplicates to priority queueu :(
     qu = util.PriorityQueue()
     visited = []
-    qu.push((problem.getStartState(), None, None), 1)  #FORMAT: (priorityQueue?, node, priority)
+    qu.push((problem.getStartState(), None, None, 0), 1)  #FORMAT: invisible problem (coords, action, actionpath), priorityPathSum)
     visited.append(problem.getStartState())
     while not qu.isEmpty():  
-        #pop first item off Queue              
+        #pop first item off Queue
         node = qu.pop()
-        #print("Current Node = ", node[0])
+
+        # idk about this, it's not really doing anything. 
+        if node[0] in visited:
+            continue
+        
+
+        print("Current Node expanding = ", node[0])
+        if node[0] not in visited:
+            visited.append(node[0])
+        #print("visitedatm = ", visited)
+       
 
 
         #check if this node is goal, if so return epic path
@@ -189,7 +199,7 @@ def uniformCostSearch(problem):
             solutionPath.append(node[1])
             return solutionPath
 
-        #if not goal, add (nonvisited) successors to Queue
+        
 
         #setup parentPath
         parentPath = []
@@ -201,10 +211,13 @@ def uniformCostSearch(problem):
         #if not goal, add (nonvisited) successors to Queue
         succ = problem.getSuccessors(node[0])
         #print("Adding Successors: ")
+        print("successors= ", succ)
         for i in succ:
             if i[0] not in visited:
-                qu.push((i[0],i[1],parentPath),i[2])
-                visited.append(i[0])
+                print(i[0], "wasn't in visited, so adding to priority queue/updating with priority=",(node[3] + i[2]))
+                #print("node = ", node)
+                qu.update((i[0],i[1],parentPath, node[3] + i[2]),(node[3] + i[2]))
+        print()        
 
 
     print("Exited Loop, no path found")
