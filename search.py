@@ -88,16 +88,16 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     #initialize stack and visited list
-    st = util.Stack()                   #initialize stack 
+    st = util.Stack()                
     visited = []
 
     #push inital state onto stack, and add it to visited list
-    st.push((problem.getStartState(), None, None))                  #FORMAT: ((x, y), action, parent)
+    st.push((problem.getStartState(), None, None))                  #FORMAT: ((x, y), action, parent's path of actions)
     visited.append(problem.getStartState())
+
     while not st.isEmpty():                
         node = st.pop()
         visited.append(node[0])
-        print("popped: ", node)
     
         #check if this node is goal, if so return epic path
         if problem.isGoalState(node[0]):
@@ -120,10 +120,8 @@ def depthFirstSearch(problem):
         for i in succ:
             if i[0] not in visited:
                 st.push((i[0],i[1],parentPath))
-                
-
-
-
+        #end of while loop and for loop
+    #if it makes it here then something went wrong
     print("exited loop failstate")
     return "f"
     
@@ -135,7 +133,7 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
 
     #initialize stack and visited list
-    qu = util.Queue()                   #initialize stack 
+    qu = util.Queue()                  
     visited = []
 
     #push inital state onto stack, and add it to visited list
@@ -163,7 +161,8 @@ def breadthFirstSearch(problem):
         for i in succ:
             if i[0] not in visited:
                 qu.push((i[0],i[1],parentPath))
-                visited.append(i[0])
+                visited.append(i[0]) #mark as visited, this is different than dfs! dfs adds it after popping
+        #end of while loop and for loop
 
     print("exited loop failstate")
     return "f"
@@ -176,30 +175,22 @@ def uniformCostSearch(problem):
     qu = util.PriorityQueue()
     visited = []
     qu.push((problem.getStartState(), None, None, 0), 1)  #FORMAT: invisible problem (coords, action, actionpath), priorityPathSum)
-    visited.append(problem.getStartState())
     while not qu.isEmpty():  
         #pop first item off Queue
         node = qu.pop()
 
-        # idk about this, it's not really doing anything. 
+        # ignore repeat nodes that made it in priority queue, see piazza post 
         if node[0] in visited:
             continue
-        
-
-        print("Current Node expanding = ", node[0])
+    
         if node[0] not in visited:
             visited.append(node[0])
-        #print("visitedatm = ", visited)
-       
-
 
         #check if this node is goal, if so return epic path
         if problem.isGoalState(node[0]):
             solutionPath = node[2]
             solutionPath.append(node[1])
             return solutionPath
-
-        
 
         #setup parentPath
         parentPath = []
@@ -210,14 +201,9 @@ def uniformCostSearch(problem):
 
         #if not goal, add (nonvisited) successors to Queue
         succ = problem.getSuccessors(node[0])
-        #print("Adding Successors: ")
-        print("successors= ", succ)
         for i in succ:
             if i[0] not in visited:
-                print(i[0], "wasn't in visited, so adding to priority queue/updating with priority=",(node[3] + i[2]))
-                #print("node = ", node)
-                qu.update((i[0],i[1],parentPath, node[3] + i[2]),(node[3] + i[2]))
-        print()        
+                qu.update((i[0],i[1],parentPath, node[3] + i[2]),(node[3] + i[2]))     
 
 
     print("Exited Loop, no path found")
@@ -230,20 +216,20 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def aStarSearch(problem, heuristic):
+def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
+
     #initialize Queue and visited list, and add initial state to it
     qu = util.PriorityQueue()
     visited = []
-    qu.push((problem.getStartState(), None, None), 1)  #FORMAT: (priorityQueue?, node, priority)
-    visited.append(problem.getStartState())
+    qu.push((problem.getStartState(), None, None, 0), 1)  #FORMAT: (priorityQueue?, node, priority)
     while not qu.isEmpty():  
         #pop first item off Queue              
         node = qu.pop()
-        #print("Current Node = ", node[0])
+
+        if node[0] in visited:
+            continue
 
         #mark (just the coordinates) as visited
         visited.append(node[0])
@@ -253,8 +239,6 @@ def aStarSearch(problem, heuristic):
             solutionPath = node[2]
             solutionPath.append(node[1])
             return solutionPath
-
-        #if not goal, add (nonvisited) successors to Queue
 
         #setup parentPath
         parentPath = []
@@ -267,13 +251,12 @@ def aStarSearch(problem, heuristic):
         succ = problem.getSuccessors(node[0])
         #print("Adding Successors: ")
         for i in succ:
-            if i[0] not in visited:
-                qu.push((i[0],i[1],parentPath),i[2] + heuristic(i[0], problem()))
-                visited.append(i[0])
-
+            if i[0] not in visited:                         
+                qu.update((i[0],i[1],parentPath, node[3] + i[2]), (node[3] + i[2]) + heuristic(i[0], problem))     
 
     print("Exited Loop, no path found")
     return []
+
 
 
 # Abbreviations
