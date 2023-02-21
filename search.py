@@ -137,13 +137,14 @@ def breadthFirstSearch(problem):
     visited = []
 
     #push inital state onto stack, and add it to visited list
-    qu.push((problem.getStartState(), None, None))                  #FORMAT: ((x, y), action, parent)
+    qu.push((problem.getStartState(), None, []))                  #FORMAT: ((x, y), action, parent)    HOWEVER, FORMAT FOR CORNERS WILL BE ((x, y), action, parent, tuple of corner booleans))
     visited.append(problem.getStartState())
 
     while not qu.isEmpty():                
         node = qu.pop()
+        nodeState = node[0]
         #check if this node is goal, if so return epic path
-        if problem.isGoalState(node[0]):
+        if problem.isGoalState(nodeState):
             solutionPath = []
             solutionPath.extend(node[2])
             solutionPath.append(node[1])
@@ -151,16 +152,16 @@ def breadthFirstSearch(problem):
 
         #build parent path to store in successors
         parentPath = []
-        if problem.getStartState() != node[0]:
+        if problem.getStartState() != nodeState:
             parentPath.extend(node[2])
             parentPath.append(node[1])
 
         #if not goal, add (nonvisited) successors to stack
         succ = []
-        succ = problem.getSuccessors(node[0])
+        succ = problem.getSuccessors(nodeState)
         for i in succ:
             if i[0] not in visited:
-                qu.push((i[0],i[1],parentPath))
+                qu.push((i[0],i[1],parentPath)) 
                 visited.append(i[0]) #mark as visited, this is different than dfs! dfs adds it after popping
         #end of while loop and for loop
 

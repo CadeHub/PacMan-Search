@@ -289,7 +289,7 @@ def euclideanHeuristic(position, problem, info={}):
 # This portion is incomplete.  Time to write code!  #
 #####################################################
 
-
+#state representation:((x, y), Action, ParentPath, (corners visited) )
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -311,7 +311,20 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+        
+        #check if start position is on any corner, if so mark as visited
+        self.startingCornerTuple = [0, 0, 0, 0]
+        if self.startingPosition in self.corners:
+            if self.startingPosition == self.corners[0]:
+                self.startingCornerTuple[0] = 1
+            elif self.startingPosition == self.corners[1]:
+                self.startingCornerTuple[1] = 1
+            elif self.startingPosition == self.corners[2]:
+                self.startingCornerTuple[2] = 1
+            else:
+                self.startingCornerTuple[3] = 1
+
+    
 
     def getStartState(self):
         """
@@ -319,14 +332,23 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingPosition
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #this operation is done everytime a node is processed, so lets see if any corners are visited on this moment:
+        print("state = ", state)
+        print("startpos = ", self.startingPosition)
+        if state[0] == self.startingPosition:
+            return False
+        elif state[3] == (1, 1, 1, 1):
+            return True
+        else:
+            return False
+
 
     def getSuccessors(self, state):
         """
@@ -340,6 +362,9 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
+
+        #return no successors if fewer visited corners in this node's path
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -349,6 +374,31 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                #BUILD NODE
+                nextState = (nextx, nexty)
+                cost = 1
+                if state == self.startingPosition:
+                    cornerTuple = self.startingCornerTuple
+                else:
+                    cornerTuple = state[3]
+
+                #if this next node is a corner, than mark it's appropriate boolean as visited
+                if nextState in self.corners:
+                    if nextState == self.corners[0]:
+                        cornerTuple[0] = 1
+                    elif nextState == self.corners[1]:
+                        cornerTuple[1] = 1
+                    elif nextState == self.corners[2]:
+                        cornerTuple[2] = 1
+                    elif nextState == self.corners[3]:
+                        cornerTuple[3] = 1
+
+
+                successors.append((nextState, action, cost, cornerTuple))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
@@ -501,8 +551,7 @@ class ClosestDotSearchAgent(SearchAgent):
         self.actions = []
         currentState = state
         while(currentState.getFood().count() > 0):
-            nextPathSegment = self.findPathToClosestDot(
-                currentState)  # The missing piece
+            nextPathSegment = self.findPathToClosestDot(currentState)  # The missing piece
             self.actions += nextPathSegment
             for action in nextPathSegment:
                 legal = currentState.getLegalActions()
@@ -526,7 +575,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.breadthFirstSearch(problem)
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -563,7 +612,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x, y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return(self.food[x][y])
 
 
 def mazeDistance(point1, point2, gameState):
