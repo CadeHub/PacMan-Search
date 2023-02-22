@@ -137,14 +137,16 @@ def breadthFirstSearch(problem):
     visited = []
 
     #push inital state onto stack, and add it to visited list
-    qu.push((problem.getStartState(), None, []))                  #FORMAT: ((x, y), action, parentPath)  
+    qu.push((problem.getStartState(), None, None))                  #FORMAT: ((x, y), action, parentPath)  
     visited.append(problem.getStartState())
 
     while not qu.isEmpty():                
         node = qu.pop()
         nodeState = node[0] 
+
         #check if this node is goal, if so return epic path
         if problem.isGoalState(nodeState):
+            #print("GOAL FOUND: ", nodeState)
             solutionPath = []
             solutionPath.extend(node[2])
             solutionPath.append(node[1])
@@ -163,8 +165,9 @@ def breadthFirstSearch(problem):
             if i[0] not in visited:
                 qu.push((i[0],i[1],parentPath)) 
                 visited.append(i[0]) #mark as visited, this is different than dfs! dfs adds it after popping
-                
+
         #end of while loop and for loop
+
     print("q empty")
 
     print("exited loop failstate")
