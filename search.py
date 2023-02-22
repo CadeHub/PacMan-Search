@@ -137,19 +137,21 @@ def breadthFirstSearch(problem):
     visited = []
 
     #push inital state onto stack, and add it to visited list
-    qu.push((problem.getStartState(), None, []))                  #FORMAT: ((x, y), action, parent)    HOWEVER, FORMAT FOR CORNERS WILL BE ((x, y), action, parent, tuple of corner booleans))
+    qu.push((problem.getStartState(), None, []))                  #FORMAT: ((x, y), action, parentPath)  
     visited.append(problem.getStartState())
 
     while not qu.isEmpty():                
         node = qu.pop()
-        nodeState = node[0]
+        nodeState = node[0] 
         #check if this node is goal, if so return epic path
         if problem.isGoalState(nodeState):
             solutionPath = []
             solutionPath.extend(node[2])
             solutionPath.append(node[1])
+            print(solutionPath)
             return solutionPath
 
+        print("looking at state: ", nodeState)
         #build parent path to store in successors
         parentPath = []
         if problem.getStartState() != nodeState:

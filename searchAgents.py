@@ -302,11 +302,11 @@ class CornersProblem(search.SearchProblem):
         Stores the walls, pacman's starting position and corners.
         """
         self.walls = startingGameState.getWalls()
-        self.startingPosition = startingGameState.getPacmanPosition()
+        self.startingPosition = startingGameState.getPacmanPosition()    #, (0, 0, 0, 0)
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1, 1), (1, top), (right, 1), (right, top))
         for corner in self.corners:
-            if not startingGameState.hasFood(*corner):
+            if not startingGameState.hasFood(*corner): 
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
@@ -332,7 +332,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.startingPosition
+        return self.startingPosition, self.startingCornerTuple
 
     def isGoalState(self, state):
         """
@@ -340,14 +340,11 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         #this operation is done everytime a node is processed, so lets see if any corners are visited on this moment:
-        print("state = ", state)
-        print("startpos = ", self.startingPosition)
-        if state[0] == self.startingPosition:
-            return False
-        elif state[3] == (1, 1, 1, 1):
-            return True
-        else:
-            return False
+        #print("state = ", state)
+        #print("startpos = ", self.startingPosition)
+        
+        return state[1] == [1, 1, 1, 1]
+            
 
 
     def getSuccessors(self, state):
@@ -374,31 +371,29 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            x, y = state
+            x, y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
                 #BUILD NODE
-                nextState = (nextx, nexty)
+                nextCoords = (nextx, nexty)
                 cost = 1
-                if state == self.startingPosition:
-                    cornerTuple = self.startingCornerTuple
-                else:
-                    cornerTuple = state[3]
+
 
                 #if this next node is a corner, than mark it's appropriate boolean as visited
-                if nextState in self.corners:
-                    if nextState == self.corners[0]:
-                        cornerTuple[0] = 1
-                    elif nextState == self.corners[1]:
-                        cornerTuple[1] = 1
-                    elif nextState == self.corners[2]:
-                        cornerTuple[2] = 1
-                    elif nextState == self.corners[3]:
-                        cornerTuple[3] = 1
+                if nextCoords in self.corners:
+                    print("inside corner found, coords = ", nextCoords)
+                    if nextCoords == self.corners[0]:
+                        state[1][0] = 1
+                    elif nextCoords == self.corners[1]:
+                        state[1][1] = 1
+                    elif nextCoords == self.corners[2]:
+                        state[1][2] = 1
+                    elif nextCoords == self.corners[3]:
+                        state[1][3] = 1
 
 
-                successors.append((nextState, action, cost, cornerTuple))
+                successors.append(((nextCoords, state[1]), action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
