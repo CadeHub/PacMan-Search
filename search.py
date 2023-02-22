@@ -148,10 +148,8 @@ def breadthFirstSearch(problem):
             solutionPath = []
             solutionPath.extend(node[2])
             solutionPath.append(node[1])
-            print(solutionPath)
             return solutionPath
 
-        print("looking at state: ", nodeState)
         #build parent path to store in successors
         parentPath = []
         if problem.getStartState() != nodeState:
@@ -165,7 +163,9 @@ def breadthFirstSearch(problem):
             if i[0] not in visited:
                 qu.push((i[0],i[1],parentPath)) 
                 visited.append(i[0]) #mark as visited, this is different than dfs! dfs adds it after popping
+                
         #end of while loop and for loop
+    print("q empty")
 
     print("exited loop failstate")
     return "f"

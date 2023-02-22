@@ -339,9 +339,6 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        #this operation is done everytime a node is processed, so lets see if any corners are visited on this moment:
-        #print("state = ", state)
-        #print("startpos = ", self.startingPosition)
         
         return state[1] == [1, 1, 1, 1]
             
@@ -360,7 +357,8 @@ class CornersProblem(search.SearchProblem):
 
         successors = []
 
-        #return no successors if fewer visited corners in this node's path
+        #build a copy so no pass by reference
+        copyCornersVisited = state[1].copy()
 
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -375,25 +373,21 @@ class CornersProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
-                #BUILD NODE
                 nextCoords = (nextx, nexty)
                 cost = 1
 
-
                 #if this next node is a corner, than mark it's appropriate boolean as visited
                 if nextCoords in self.corners:
-                    print("inside corner found, coords = ", nextCoords)
                     if nextCoords == self.corners[0]:
-                        state[1][0] = 1
+                        copyCornersVisited[0] = 1
                     elif nextCoords == self.corners[1]:
-                        state[1][1] = 1
+                        copyCornersVisited[1] = 1
                     elif nextCoords == self.corners[2]:
-                        state[1][2] = 1
+                        copyCornersVisited[2] = 1
                     elif nextCoords == self.corners[3]:
-                        state[1][3] = 1
-
-
-                successors.append(((nextCoords, state[1]), action, cost))
+                        copyCornersVisited[3] = 1
+                    
+                successors.append(((nextCoords, copyCornersVisited), action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
