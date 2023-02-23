@@ -324,7 +324,8 @@ class CornersProblem(search.SearchProblem):
             else:
                 self.startingCornerTuple[3] = 1
 
-    
+    def minimumWall(self):
+        return min(self.walls.height-2, self.walls.width-2)
 
     def getStartState(self):
         """
@@ -423,7 +424,34 @@ def cornersHeuristic(state, problem):
     walls = problem.walls
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    print("=goal is ", problem.isGoalState(state))
+    if problem.isGoalState(state):
+        return 0
+
+    heuristicTotal = 0
+    position = state[0]
+    pathsList = []
+    copyCornersVisited = state[1].copy()
+    
+    #base distance, calc width and height and take smallest
+    baseDistance = problem.minimumWall() - 2 #might be able to just use walls
+    numUnvisited = 0
+    for idx, x in enumerate(copyCornersVisited):
+        if x == 0:
+            xy1 = position
+            xy2 = corners[idx]
+            pathsList.append( abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]) )
+            numUnvisited +=1
+    numUnvisited -=1
+    pathsList.sort()
+    heuristicTotal += pathsList.pop(0)
+
+    if numUnvisited > 0:
+        heuristicTotal += numUnvisited * baseDistance
+
+    #take shortest path, and add however many other unvisitedNodesCount * baseDistance
+    #print("Total Paths = ", totalPaths)
+    return heuristicTotal
 
 
 class AStarCornersAgent(SearchAgent):

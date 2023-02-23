@@ -144,6 +144,8 @@ def breadthFirstSearch(problem):
         node = qu.pop()
         nodeState = node[0] 
 
+        print(nodeState)
+
         #check if this node is goal, if so return epic path
         if problem.isGoalState(nodeState):
             #print("GOAL FOUND: ", nodeState)
@@ -233,6 +235,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while not qu.isEmpty():  
         #pop first item off Queue              
         node = qu.pop()
+        nodeState = node[0]
 
         if node[0] in visited:
             continue
@@ -241,7 +244,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         visited.append(node[0])
 
         #check if this node is goal, if so return epic path
-        if problem.isGoalState(node[0]):
+        if problem.isGoalState(nodeState):
             solutionPath = node[2]
             solutionPath.append(node[1])
             return solutionPath
@@ -249,12 +252,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         #setup parentPath
         parentPath = []
         #if start state than ignore parentPath setup (because there isn't one)
-        if problem.getStartState() != node[0]:
+        if problem.getStartState() != nodeState:
             parentPath.extend(node[2])
             parentPath.append(node[1])
 
         #if not goal, add (nonvisited) successors to Queue
-        succ = problem.getSuccessors(node[0])
+        succ = []
+        succ = problem.getSuccessors(nodeState)
         #print("Adding Successors: ")
         for i in succ:
             if i[0] not in visited:                         
