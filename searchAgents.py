@@ -289,7 +289,9 @@ def euclideanHeuristic(position, problem, info={}):
 # This portion is incomplete.  Time to write code!  #
 #####################################################
 
-#state representation:((x, y), Action, ParentPath, (corners visited) )
+# state representation:((x, y), Action, ParentPath, (corners visited) )
+
+
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -302,17 +304,17 @@ class CornersProblem(search.SearchProblem):
         Stores the walls, pacman's starting position and corners.
         """
         self.walls = startingGameState.getWalls()
-        self.startingPosition = startingGameState.getPacmanPosition()    #, (0, 0, 0, 0)
+        self.startingPosition = startingGameState.getPacmanPosition()  # , (0, 0, 0, 0)
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1, 1), (1, top), (right, 1), (right, top))
         for corner in self.corners:
-            if not startingGameState.hasFood(*corner): 
+            if not startingGameState.hasFood(*corner):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        
-        #check if start position is on any corner, if so mark as visited
+
+        # check if start position is on any corner, if so mark as visited
         self.startingCornerTuple = [0, 0, 0, 0]
         if self.startingPosition in self.corners:
             if self.startingPosition == self.corners[0]:
@@ -323,8 +325,6 @@ class CornersProblem(search.SearchProblem):
                 self.startingCornerTuple[2] = 1
             else:
                 self.startingCornerTuple[3] = 1
-
-    
 
     def getStartState(self):
         """
@@ -339,10 +339,8 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        
-        return state[1] == [1, 1, 1, 1]
-            
 
+        return state[1] == [1, 1, 1, 1]
 
     def getSuccessors(self, state):
         """
@@ -356,7 +354,7 @@ class CornersProblem(search.SearchProblem):
         """
         successors = []
 
-        #build a copy so no pass by reference
+        # build a copy so no pass by reference
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -373,7 +371,7 @@ class CornersProblem(search.SearchProblem):
                 nextCoords = (nextx, nexty)
                 cost = 1
 
-                #if this next node is a corner, than mark it's appropriate boolean as visited
+                # if this next node is a corner, than mark it's appropriate boolean as visited
                 if nextCoords in self.corners:
                     if nextCoords == self.corners[0]:
                         copyCornersVisited[0] = 1
@@ -384,7 +382,8 @@ class CornersProblem(search.SearchProblem):
                     elif nextCoords == self.corners[3]:
                         copyCornersVisited[3] = 1
 
-                successors.append(((nextCoords, copyCornersVisited), action, cost))
+                successors.append(
+                    ((nextCoords, copyCornersVisited), action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
@@ -423,7 +422,7 @@ def cornersHeuristic(state, problem):
     walls = problem.walls
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    return 0
 
 
 class AStarCornersAgent(SearchAgent):
@@ -527,6 +526,18 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    foodPieces = list(foodGrid.asList())
+
+    if len(foodPieces):
+        cornerDistances = []
+
+        for piece in foodPieces:
+            cornerDistances.append(util.manhattanDistance(state[0], piece))
+
+        sorted_dists = sorted(cornerDistances)
+        dist = sorted_dists[0]
+        return dist
+
     return 0
 
 
@@ -537,7 +548,8 @@ class ClosestDotSearchAgent(SearchAgent):
         self.actions = []
         currentState = state
         while(currentState.getFood().count() > 0):
-            nextPathSegment = self.findPathToClosestDot(currentState)  # The missing piece
+            nextPathSegment = self.findPathToClosestDot(
+                currentState)  # The missing piece
             self.actions += nextPathSegment
             for action in nextPathSegment:
                 legal = currentState.getLegalActions()
